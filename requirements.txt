@@ -1,0 +1,2 @@
+requests==2.19.1
+guillotina==4.0.3
