@@ -33,6 +33,7 @@ setup(
     install_requires=requirements,
     extras_require={
         'test': [
+            'aiohttp>=3.0.0,<4.0.0',
             'pytest<=3.1.0',
             'docker',
             'psycopg2',
