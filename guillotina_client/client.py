@@ -1,5 +1,5 @@
-from guillotinaclient.api import ApiClient
-from guillotinaclient.auth import BasicAuth
+from .api import ApiClient
+from .auth import BasicAuth
 
 
 def GuillotinaClient(server, username, password, auth_type='basic'):
