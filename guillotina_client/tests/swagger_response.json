@@ -1,0 +1,1306 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "4.0.3",
+        "title": "Guillotina",
+        "description": "The REST Resource API"
+    },
+    "host": "localhost:8080",
+    "basePath": "",
+    "schemes": [
+        "http"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "paths": {
+        "/db/account3/folder/@behaviors": {
+            "patch": {
+                "tags": [
+                    "behaviors"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/Behavior"
+                        }
+                    }
+                ],
+                "produces": [],
+                "summary": "Add behavior to resource",
+                "description": "permission: guillotina.ModifyContent",
+                "responses": {
+                    "200": {
+                        "description": "Successfully added behavior"
+                    },
+                    "201": {
+                        "description": "Behavior already assigned here"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "behaviors"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/Behavior"
+                        }
+                    }
+                ],
+                "produces": [],
+                "summary": "Remove behavior from resource",
+                "description": "permission: guillotina.ModifyContent",
+                "responses": {
+                    "200": {
+                        "description": "Successfully removed behavior"
+                    },
+                    "201": {
+                        "description": "Behavior not assigned here"
+                    }
+                }
+            },
+            "get": {
+                "tags": [
+                    "behaviors"
+                ],
+                "parameters": {},
+                "produces": [],
+                "summary": "Get information on behaviors for this resource",
+                "description": "permission: guillotina.AccessContent",
+                "responses": {
+                    "200": {
+                        "description": "A listing of behaviors for content",
+                        "schema": {
+                            "$ref": "#/definitions/BehaviorsResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/db/account3/folder/@sharing": {
+            "get": {
+                "tags": [
+                    "sharing"
+                ],
+                "parameters": {},
+                "produces": [],
+                "summary": "Get sharing settings for this resource",
+                "description": "permission: guillotina.SeePermissions",
+                "responses": {
+                    "200": {
+                        "description": "All the sharing defined on this resource",
+                        "schema": {
+                            "$ref": "#/definitions/ResourceACL"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "sharing"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "type": "object",
+                        "schema": {
+                            "$ref": "#/definitions/Permissions"
+                        }
+                    }
+                ],
+                "produces": [],
+                "summary": "Change permissions for a resource",
+                "description": "permission: guillotina.ChangePermissions",
+                "responses": {
+                    "200": {
+                        "description": "Successfully changed permission"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "sharing"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "type": "object",
+                        "schema": {
+                            "$ref": "#/definitions/Permissions"
+                        }
+                    }
+                ],
+                "produces": [],
+                "summary": "Replace permissions for a resource",
+                "description": "permission: guillotina.ChangePermissions",
+                "responses": {
+                    "200": {
+                        "description": "Successfully replaced permissions"
+                    }
+                }
+            }
+        },
+        "/db/account3/folder/@all_permissions": {
+            "get": {
+                "tags": [
+                    "all_permissions"
+                ],
+                "parameters": {},
+                "produces": [],
+                "summary": "See all permission settings for this resource",
+                "description": "permission: guillotina.SeePermissions",
+                "responses": {
+                    "200": {
+                        "description": "All the permissions defined on this resource",
+                        "schema": {
+                            "$ref": "#/definitions/AllPermissions"
+                        }
+                    }
+                }
+            }
+        },
+        "/db/account3/folder/@canido": {
+            "get": {
+                "tags": [
+                    "canido"
+                ],
+                "parameters": [
+                    {
+                        "name": "permission",
+                        "in": "query",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "produces": [],
+                "summary": "",
+                "description": "permission: guillotina.AccessContent",
+                "responses": {
+                    "200": {
+                        "description": "Successfully changed permission"
+                    }
+                }
+            }
+        },
+        "/db/account3/folder/@move": {
+            "post": {
+                "tags": [
+                    "move"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "type": "object",
+                        "schema": {
+                            "properties": {
+                                "destination": {
+                                    "type": "string",
+                                    "description": "Absolute path to destination object from container",
+                                    "required": false
+                                },
+                                "new_id": {
+                                    "type": "string",
+                                    "description": "Optional new id to assign object",
+                                    "required": false
+                                }
+                            }
+                        }
+                    }
+                ],
+                "produces": [],
+                "summary": "Move resource",
+                "description": "permission: guillotina.MoveContent",
+                "responses": {
+                    "200": {
+                        "description": "Successfully moved resource"
+                    }
+                }
+            }
+        },
+        "/db/account3/folder/@duplicate": {
+            "post": {
+                "tags": [
+                    "duplicate"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "type": "object",
+                        "schema": {
+                            "properties": {
+                                "destination": {
+                                    "type": "string",
+                                    "description": "Absolute path to destination object from container",
+                                    "required": false
+                                },
+                                "new_id": {
+                                    "type": "string",
+                                    "description": "Optional new id to assign object",
+                                    "required": false
+                                }
+                            }
+                        }
+                    }
+                ],
+                "produces": [],
+                "summary": "Duplicate resource",
+                "description": "permission: guillotina.DuplicateContent",
+                "responses": {
+                    "200": {
+                        "description": "Successfully duplicated object"
+                    }
+                }
+            }
+        },
+        "/db/account3/folder/@dynamic-fields": {
+            "get": {
+                "tags": [
+                    "dynamic-fields"
+                ],
+                "parameters": {},
+                "produces": [],
+                "summary": "Get a list of available fields",
+                "description": "permission: guillotina.ModifyContent",
+                "responses": {}
+            }
+        },
+        "/db/account3/folder/@upload/{field_name}/{field_name}": {
+            "patch": {
+                "tags": [
+                    "upload/{field_name}"
+                ],
+                "parameters": [
+                    {
+                        "name": "field_name",
+                        "in": "path",
+                        "description": "Name of file field",
+                        "required": true
+                    }
+                ],
+                "produces": [],
+                "summary": "Update the content of a file",
+                "description": "permission: guillotina.ModifyContent",
+                "responses": {
+                    "200": {
+                        "description": "Successfully updated content"
+                    }
+                }
+            }
+        },
+        "/db/account3/folder/@download/{field_name}/{field_name}": {
+            "get": {
+                "tags": [
+                    "download/{field_name}"
+                ],
+                "parameters": [
+                    {
+                        "name": "field_name",
+                        "in": "path",
+                        "description": "Name of file field",
+                        "required": true
+                    }
+                ],
+                "produces": [],
+                "summary": "Download the content of a file",
+                "description": "permission: guillotina.ViewContent",
+                "responses": {
+                    "200": {
+                        "description": "Successfully updated content"
+                    }
+                }
+            }
+        },
+        "/db/account3/folder/@tusupload/{field_name}/{field_name}": {
+            "post": {
+                "tags": [
+                    "tusupload/{field_name}"
+                ],
+                "parameters": [
+                    {
+                        "name": "field_name",
+                        "in": "path",
+                        "description": "Name of file field",
+                        "required": true
+                    },
+                    {
+                        "name": "Upload-Offset",
+                        "in": "headers",
+                        "type": "integer",
+                        "required": true
+                    },
+                    {
+                        "name": "UPLOAD-LENGTH",
+                        "in": "headers",
+                        "type": "integer",
+                        "required": true
+                    },
+                    {
+                        "name": "UPLOAD-MD5",
+                        "in": "headers",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "name": "UPLOAD-EXTENSION",
+                        "in": "headers",
+                        "type": "string",
+                        "required": false
+                    },
+                    {
+                        "name": "TUS-RESUMABLE",
+                        "in": "headers",
+                        "type": "string",
+                        "required": true
+                    },
+                    {
+                        "name": "UPLOAD-METADATA",
+                        "in": "headers",
+                        "type": "string",
+                        "required": false
+                    }
+                ],
+                "produces": [],
+                "summary": "TUS endpoint",
+                "description": "permission: guillotina.ModifyContent",
+                "responses": {
+                    "204": {
+                        "description": "Successfully patched data",
+                        "headers": {
+                            "Location": {
+                                "type": "string"
+                            },
+                            "Tus-Resumable": {
+                                "type": "string"
+                            },
+                            "Access-Control-Expose-Headers": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "head": {
+                "tags": [
+                    "tusupload/{field_name}"
+                ],
+                "parameters": [
+                    {
+                        "name": "field_name",
+                        "in": "path",
+                        "description": "Name of file field",
+                        "required": true
+                    }
+                ],
+                "produces": [],
+                "summary": "TUS endpoint",
+                "description": "permission: guillotina.ModifyContent",
+                "responses": {
+                    "200": {
+                        "description": "Successfully patched data",
+                        "headers": {
+                            "Upload-Offset": {
+                                "type": "integer"
+                            },
+                            "Tus-Resumable": {
+                                "type": "string"
+                            },
+                            "Access-Control-Expose-Headers": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "tusupload/{field_name}"
+                ],
+                "parameters": [
+                    {
+                        "name": "field_name",
+                        "in": "path",
+                        "description": "Name of file field",
+                        "required": true
+                    },
+                    {
+                        "name": "Upload-Offset",
+                        "in": "headers",
+                        "type": "integer",
+                        "required": true
+                    },
+                    {
+                        "name": "CONTENT-LENGTH",
+                        "in": "headers",
+                        "type": "integer",
+                        "required": true
+                    }
+                ],
+                "produces": [],
+                "summary": "TUS endpoint",
+                "description": "permission: guillotina.ModifyContent",
+                "responses": {
+                    "204": {
+                        "description": "Successfully patched data",
+                        "headers": {
+                            "Upload-Offset": {
+                                "type": "integer"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/db/account3/folder/@search": {
+            "get": {
+                "tags": [
+                    "search"
+                ],
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "produces": [],
+                "summary": "Make search request",
+                "description": "permission: guillotina.SearchContent",
+                "responses": {
+                    "200": {
+                        "description": "Search results",
+                        "type": "object",
+                        "schema": {
+                            "$ref": "#/definitions/SearchResults"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "search"
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "properties": {}
+                        }
+                    }
+                ],
+                "produces": [],
+                "summary": "Make a complex search query",
+                "description": "permission: guillotina.RawSearchContent",
+                "responses": {
+                    "200": {
+                        "description": "Search results",
+                        "type": "object",
+                        "schema": {
+                            "$ref": "#/definitions/SearchResults"
+                        }
+                    }
+                }
+            }
+        },
+        "/db/account3/folder/@catalog-reindex": {
+            "post": {
+                "tags": [
+                    "catalog-reindex"
+                ],
+                "parameters": {},
+                "produces": [],
+                "summary": "Reindex entire container content",
+                "description": "permission: guillotina.ReindexContent",
+                "responses": {
+                    "200": {
+                        "description": "Successfully reindexed content"
+                    }
+                }
+            }
+        },
+        "/db/account3/folder/@async-catalog-reindex": {
+            "post": {
+                "tags": [
+                    "async-catalog-reindex"
+                ],
+                "parameters": {},
+                "produces": [],
+                "summary": "Asynchronously reindex entire container content",
+                "description": "permission: guillotina.ReindexContent",
+                "responses": {
+                    "200": {
+                        "description": "Successfully initiated reindexing"
+                    }
+                }
+            }
+        },
+        "/db/account3/folder/@catalog": {
+            "post": {
+                "tags": [
+                    "catalog"
+                ],
+                "parameters": {},
+                "produces": [],
+                "summary": "Initialize catalog",
+                "description": "permission: guillotina.ManageCatalog",
+                "responses": {
+                    "200": {
+                        "description": "Successfully initialized catalog"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "catalog"
+                ],
+                "parameters": {},
+                "produces": [],
+                "summary": "Delete search catalog",
+                "description": "permission: guillotina.ManageCatalog",
+                "responses": {
+                    "200": {
+                        "description": "Successfully deleted catalog"
+                    }
+                }
+            }
+        },
+        "/db/account3/folder": {
+            "head": {
+                "tags": [
+                    ""
+                ],
+                "parameters": {},
+                "produces": [],
+                "summary": "",
+                "description": "permission: guillotina.ViewContent",
+                "responses": {}
+            },
+            "get": {
+                "tags": [
+                    ""
+                ],
+                "parameters": [
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "type": "string"
+                    },
+                    {
+                        "name": "omit",
+                        "in": "query",
+                        "type": "string"
+                    }
+                ],
+                "produces": [],
+                "summary": "Retrieves serialization of resource",
+                "description": "permission: guillotina.ViewContent",
+                "responses": {
+                    "200": {
+                        "description": "Resource data",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/ResourceFolder"
+                                },
+                                {
+                                    "properties": {
+                                        "guillotina.behaviors.dublincore.IDublinCore": {
+                                            "type": "object",
+                                            "properties": {
+                                                "title": {
+                                                    "required": true,
+                                                    "title": "Title",
+                                                    "type": "string",
+                                                    "minLength": 0
+                                                },
+                                                "description": {
+                                                    "required": true,
+                                                    "title": "Description",
+                                                    "type": "string",
+                                                    "minLength": 0
+                                                },
+                                                "creation_date": {
+                                                    "required": true,
+                                                    "title": "Creation Date",
+                                                    "type": "string"
+                                                },
+                                                "modification_date": {
+                                                    "required": true,
+                                                    "title": "Modification Date",
+                                                    "type": "string"
+                                                },
+                                                "effective_date": {
+                                                    "required": true,
+                                                    "title": "Effective Date",
+                                                    "type": "string"
+                                                },
+                                                "expiration_date": {
+                                                    "required": true,
+                                                    "title": "Expiration Date",
+                                                    "type": "string"
+                                                },
+                                                "creators": {
+                                                    "required": true,
+                                                    "title": "Creators",
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "minLength": 0
+                                                },
+                                                "tags": {
+                                                    "required": true,
+                                                    "title": "Tags",
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "minLength": 0
+                                                },
+                                                "publisher": {
+                                                    "required": true,
+                                                    "title": "Publisher",
+                                                    "type": "string",
+                                                    "minLength": 0
+                                                },
+                                                "contributors": {
+                                                    "required": true,
+                                                    "title": "Contributors",
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "minLength": 0
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    ""
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/AddableResource"
+                        }
+                    }
+                ],
+                "produces": [],
+                "summary": "Add new resouce inside this container resource",
+                "description": "permission: guillotina.AddContent",
+                "responses": {
+                    "200": {
+                        "description": "Resource data",
+                        "schema": {
+                            "$ref": "#/definitions/ResourceFolder"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    ""
+                ],
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/WritableResource"
+                                },
+                                {
+                                    "properties": {
+                                        "guillotina.behaviors.dublincore.IDublinCore": {
+                                            "type": "object",
+                                            "properties": {
+                                                "title": {
+                                                    "required": true,
+                                                    "title": "Title",
+                                                    "type": "string",
+                                                    "minLength": 0
+                                                },
+                                                "description": {
+                                                    "required": true,
+                                                    "title": "Description",
+                                                    "type": "string",
+                                                    "minLength": 0
+                                                },
+                                                "creation_date": {
+                                                    "required": true,
+                                                    "title": "Creation Date",
+                                                    "type": "string"
+                                                },
+                                                "modification_date": {
+                                                    "required": true,
+                                                    "title": "Modification Date",
+                                                    "type": "string"
+                                                },
+                                                "effective_date": {
+                                                    "required": true,
+                                                    "title": "Effective Date",
+                                                    "type": "string"
+                                                },
+                                                "expiration_date": {
+                                                    "required": true,
+                                                    "title": "Expiration Date",
+                                                    "type": "string"
+                                                },
+                                                "creators": {
+                                                    "required": true,
+                                                    "title": "Creators",
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "minLength": 0
+                                                },
+                                                "tags": {
+                                                    "required": true,
+                                                    "title": "Tags",
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "minLength": 0
+                                                },
+                                                "publisher": {
+                                                    "required": true,
+                                                    "title": "Publisher",
+                                                    "type": "string",
+                                                    "minLength": 0
+                                                },
+                                                "contributors": {
+                                                    "required": true,
+                                                    "title": "Contributors",
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "minLength": 0
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "produces": [],
+                "summary": "Modify the content of this resource",
+                "description": "permission: guillotina.ModifyContent",
+                "responses": {
+                    "200": {
+                        "description": "Resource data",
+                        "schema": {
+                            "$ref": "#/definitions/Resource"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    ""
+                ],
+                "parameters": {},
+                "produces": [],
+                "summary": "Delete resource",
+                "description": "permission: guillotina.DeleteContent",
+                "responses": {
+                    "200": {
+                        "description": "Successfully deleted resource"
+                    }
+                }
+            }
+        },
+        "/db/account3/folder/@ids": {
+            "get": {
+                "tags": [
+                    "ids"
+                ],
+                "parameters": {},
+                "produces": [],
+                "summary": "Return a list of ids in the resource",
+                "description": "permission: guillotina.ViewContent",
+                "responses": {
+                    "200": {
+                        "description": "Successfully returned list of ids"
+                    }
+                }
+            }
+        },
+        "/db/account3/folder/@items": {
+            "get": {
+                "tags": [
+                    "items"
+                ],
+                "parameters": [
+                    {
+                        "name": "include",
+                        "in": "query",
+                        "type": "string"
+                    },
+                    {
+                        "name": "omit",
+                        "in": "query",
+                        "type": "string"
+                    },
+                    {
+                        "name": "page_size",
+                        "in": "query",
+                        "type": "number",
+                        "default": 20
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "type": "number",
+                        "default": 1
+                    }
+                ],
+                "produces": [],
+                "summary": "Paginated list of sub objects",
+                "description": "permission: guillotina.ViewContent",
+                "responses": {
+                    "200": {
+                        "description": "Successfully returned response object"
+                    }
+                }
+            }
+        },
+        "/db/account3/folder/@addable-types": {
+            "get": {
+                "tags": [
+                    "addable-types"
+                ],
+                "parameters": {},
+                "produces": [],
+                "summary": "Return a list of type names that can be added to container",
+                "description": "permission: guillotina.AddContent",
+                "responses": {
+                    "200": {
+                        "description": "Successfully returned list of type names"
+                    }
+                }
+            }
+        },
+        "/db/account3/folder/@invalidate-cache": {
+            "get": {
+                "tags": [
+                    "invalidate-cache"
+                ],
+                "parameters": {},
+                "produces": [],
+                "summary": "Invalidate cache of object",
+                "description": "permission: guillotina.ModifyContent",
+                "responses": {
+                    "200": {
+                        "description": "Successfully invalidated"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "Addon": {
+            "type": "object",
+            "title": "Addon data",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "required": true
+                },
+                "title": {
+                    "type": "string",
+                    "required": false
+                }
+            }
+        },
+        "AddonResponse": {
+            "type": "object",
+            "title": "Addons response data",
+            "properties": {
+                "available": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "$ref": "#/definitions/Addon"
+                    }
+                },
+                "installed": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "$ref": "#/definitions/Addon"
+                    }
+                }
+            }
+        },
+        "Application": {
+            "type": "object",
+            "title": "Application data",
+            "properties": {
+                "databases": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "static_file": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "static_directory": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "Behavior": {
+            "type": "object",
+            "title": "Behavior",
+            "properties": {
+                "behavior": {
+                    "type": "string",
+                    "title": "Dotted name to interface",
+                    "required": true
+                }
+            }
+        },
+        "BehaviorsResponse": {
+            "type": "object",
+            "title": "Behavior data on a resource",
+            "properties": {
+                "static": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "title": "Dotted name to interface"
+                    }
+                },
+                "dynamic": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "title": "Dotted name to interface"
+                    }
+                },
+                "available": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "title": "Dotted name to interface"
+                    }
+                }
+            }
+        },
+        "BaseResource": {
+            "type": "object",
+            "title": "Base resource data",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "required": true
+                },
+                "@type": {
+                    "type": "string",
+                    "required": true
+                },
+                "title": {
+                    "type": "string",
+                    "required": true
+                }
+            }
+        },
+        "WritableResource": {
+            "type": "object",
+            "title": "Writable resource data",
+            "properties": {
+                "title": {
+                    "type": "string",
+                    "required": true
+                }
+            }
+        },
+        "AddableResource": {
+            "type": "object",
+            "title": "Writable resource data",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/BaseResource"
+                },
+                {
+                    "$ref": "#/definitions/WritableResource"
+                }
+            ]
+        },
+        "Resource": {
+            "type": "object",
+            "title": "Resource data",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/WritableResource"
+                },
+                {
+                    "properties": {
+                        "@id": {
+                            "type": "string",
+                            "required": true
+                        },
+                        "@type": {
+                            "type": "string",
+                            "required": true
+                        },
+                        "parent": {
+                            "type": "object",
+                            "schema": {
+                                "properties": {
+                                    "@id": {
+                                        "type": "string"
+                                    },
+                                    "@type": {
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "required": false
+                        }
+                    }
+                }
+            ]
+        },
+        "ResourceFolder": {
+            "type": "object",
+            "title": "Resource folder data",
+            "allOf": [
+                {
+                    "$ref": "#/definitions/Resource"
+                },
+                {
+                    "properties": {
+                        "items": {
+                            "type": "object",
+                            "schema": {
+                                "$ref": "#/definitions/Resource"
+                            }
+                        },
+                        "length": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            ]
+        },
+        "ACL": {
+            "type": "object",
+            "title": "A set of permissions",
+            "properties": {
+                "@id": {
+                    "type": "string",
+                    "required": false
+                },
+                "roleperm": {
+                    "type": "object"
+                },
+                "prinperm": {
+                    "type": "object"
+                },
+                "prinrole": {
+                    "type": "object"
+                }
+            }
+        },
+        "ResourceACL": {
+            "type": "object",
+            "title": "All permissions for an object",
+            "properties": {
+                "local": {
+                    "type": "object",
+                    "schema": {
+                        "$ref": "#/definitions/ACL"
+                    }
+                },
+                "inherit": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "schema": {
+                            "$ref": "#/definitions/ACL"
+                        }
+                    }
+                }
+            }
+        },
+        "PrincipalRole": {
+            "type": "object",
+            "title": "Role assigned to principal",
+            "properties": {
+                "principal": {
+                    "type": "string",
+                    "required": true
+                },
+                "role": {
+                    "type": "string",
+                    "required": true
+                },
+                "setting": {
+                    "enum": [
+                        "Allow",
+                        "Deny",
+                        "AllowSingle",
+                        "Unset"
+                    ],
+                    "required": true
+                }
+            }
+        },
+        "PrincipalPermission": {
+            "type": "object",
+            "title": "Permission assigned to principal",
+            "properties": {
+                "principal": {
+                    "type": "string",
+                    "required": true
+                },
+                "permission": {
+                    "type": "string",
+                    "required": true
+                },
+                "setting": {
+                    "enum": [
+                        "Allow",
+                        "Deny",
+                        "AllowSingle",
+                        "Unset"
+                    ],
+                    "required": true
+                }
+            }
+        },
+        "RolePermission": {
+            "type": "object",
+            "title": "Permission assigned to role",
+            "properties": {
+                "permission": {
+                    "type": "string",
+                    "required": true
+                },
+                "role": {
+                    "type": "string",
+                    "required": true
+                },
+                "setting": {
+                    "enum": [
+                        "Allow",
+                        "Deny",
+                        "AllowSingle",
+                        "Unset"
+                    ],
+                    "required": true
+                }
+            }
+        },
+        "Permissions": {
+            "type": "object",
+            "title": "Permissions defined for a resource ACL",
+            "properties": {
+                "prinperm": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "schema": {
+                            "$ref": "#/definitions/PrincipalPermission"
+                        }
+                    },
+                    "required": false
+                },
+                "prinrole": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "schema": {
+                            "$ref": "#/definitions/PrincipalRole"
+                        }
+                    },
+                    "required": false
+                },
+                "roleperm": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "schema": {
+                            "$ref": "#/definitions/RolePermission"
+                        }
+                    },
+                    "required": false
+                }
+            }
+        },
+        "AllPermissions": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "schema": {
+                    "type": "object",
+                    "schema": {
+                        "$ref": "#/definitions/Permissions"
+                    }
+                }
+            }
+        },
+        "SearchResult": {
+            "type": "object",
+            "title": "Search result",
+            "properties": {}
+        },
+        "SearchResults": {
+            "type": "object",
+            "title": "Search results",
+            "properties": {
+                "member": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "schema": {
+                            "$ref": "#/definitions/SearchResult"
+                        }
+                    },
+                    "required": true
+                },
+                "items_count": {
+                    "type": "integer",
+                    "required": false
+                }
+            }
+        }
+    }
+}
