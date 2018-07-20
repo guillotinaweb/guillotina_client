@@ -1,6 +1,5 @@
 from guillotina_client.swagger import EndpointProducer
 from guillotina_client.client import GuillotinaClient
-from guillotina.factory import make_app
 from aiohttp.test_utils import TestServer
 
 from guillotina.tests.fixtures import GuillotinaDBRequester
@@ -10,6 +9,7 @@ import os
 import pytest
 import threading
 import asyncio
+
 
 @pytest.fixture(scope='function')
 def guillotina_server(db, guillotina_main, loop):
@@ -38,7 +38,6 @@ def client(guillotina_server):
     host = guillotina_server.server.host
     port = guillotina_server.server.port
     server_url = f'http://{host}:{port}'
-    import pdb; pdb.set_trace()
     yield GuillotinaClient(server_url, 'root', 'root')
 
 

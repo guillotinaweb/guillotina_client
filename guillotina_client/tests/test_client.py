@@ -2,7 +2,8 @@ def test_client_basic(client):
     # Test db and container
     cid = 'testcontainer'
     # First set the database
-    client.set_database('db')
+    db = 'db'
+    client.set_database(db)
     # You can create a container it it doesn't exist already
     client.create_container(id=cid, title='My Test Container')
     # Set it
@@ -11,10 +12,10 @@ def test_client_basic(client):
     # Get a map of databases and containers
     containers_per_db = {}
     for db in client.list_databases():
-    for c in client.list_containers(db):
-        containers_per_db.setdefault(db, [])
-        containers_per_db[db].append(c)
-    assert containers_per_db['db'] == [cid]
+        for c in client.list_containers(db):
+            containers_per_db.setdefault(db, [])
+            containers_per_db[db].append(c)
+    assert containers_per_db[db] == [cid]
 
     # Once you set the container, you can create content
     folder = client.container.get_or_create(
@@ -49,7 +50,7 @@ def test_client_basic(client):
     folder_ = client.container['folder']
     item_ = folder_['myitem']
     subfolder_ = folder_['subfolder']
-    subitem_ = subfoder_['myitem']
+    subitem_ = subfolder_['myitem']
 
     assert folder.path == folder_.path
     assert subfolder.path == subfolder_.path
