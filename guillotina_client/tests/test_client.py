@@ -9,6 +9,9 @@ def test_client_basic(client):
     # Set it
     client.set_container(cid, db=db)
 
+    resp = client.get_request(client.container.base_url)
+    assert client.container.id == cid == resp['@name']
+
     # Get a map of databases and containers
     containers_per_db = {}
     for db in client.list_databases():
