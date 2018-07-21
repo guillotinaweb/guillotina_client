@@ -15,54 +15,45 @@ RETRIABLE_EXCEPTIONS = (RetriableAPIException)
 
 
 class Method:
-    @classmethod
-    def add_methods(cls):
+    def add_methods(self, cls):
         logger = logging.getLogger('Logger')
-        for endpoint in cls.endpoints:
+        for endpoint in cls.endpoints.values():
             endpoint_name = endpoint.endpoint.replace('@', '')
             endpoint_name = endpoint_name.replace('-', '_')
             for method_rest in endpoint.methods:
                 def method(**kargs):
                     if method_rest == 'get':
-                        cls.client.get_request(cls.path, **kargs)
+                        return cls.client.get_request(cls.path, **kargs)
                     elif method_rest == 'patch':
-                        cls.client.patch_request(cls.path, **kargs)
+                        return cls.client.patch_request(cls.path, **kargs)
                     elif method_rest == 'post':
-                        cls.client.post_request(cls.path, **kargs)
+                        return cls.client.post_request(cls.path, **kargs)
                     else:
                         logger.warning("Method not implemented")
                 parameters = str(endpoint.parameters)
-                method.__doc__ = endpoint.summary[method_rest] + str(parameters)
-                method.__name__ = f"{method_rest}{endpoint_name}"
-                setattr(cls, method.__name__, method)
+                if '@' in endpoint.endpoint:
+                    method.__doc__ = endpoint.summary[method_rest] + str(parameters)
+                    method.__name__ = f"{method_rest}{endpoint_name}"
+                    setattr(cls, method.__name__, method)
 
 
 class Container:
     def __init__(self, cid, db, client):
         self.id = cid
         self.db = db
-        self.logger = logging.getLogger('Logger')
         self.client = client
-
-    @property
-    def swagger(self):
-        url_swagger = join(self.path, '@swagger')
-        swagger_response = self.client.get_request(url_swagger)
-        return swagger_response
 
     @property
     def server(self):
         return self.client.server
 
     @property
-    def path(self):
+    def base_url(self):
         return join(self.server, join(self.db, self.id))
 
     def create(self, type, id, title=None, path=None):
-        """
-        path is relative to container url
-        """
-        path = join(self.path, path or '')
+        if not path:
+            path = self.base_url
         self.client.post_request(
             path,
             data=json.dumps({
@@ -76,7 +67,7 @@ class Container:
     def get(self, target):
         """
         path is relative to container url"""
-        path = join(self.path, target)
+        path = join(self.base_url, target)
         return Resource(path=path, client=self.client)
 
     def get_or_create(self, type, id, title=None, path=None):
@@ -85,13 +76,13 @@ class Container:
                 target = join(path, id)
             else:
                 target = id
-            target = target.lstrip(self.path)
+            target = target.lstrip(self.base_url)
             return self.get(target)
         except NotExistsException:
             return self.create(type, id, title, path)
 
     def __getitem__(self, key):
-        path = join(self.path, key)
+        path = join(self.base_url, key)
         return Resource(path=path, client=self.client)
 
 
@@ -216,9 +207,10 @@ class Resource(Method):
         self.id = id
         self.endpoints = {}
         logger = logging.getLogger()
-        for endpoint in EndpointProducer(self.swagger, logger):
+        instance = EndpointProducer(self.swagger, logger)
+        for endpoint in instance.endpoint_generator():
             self.endpoints[endpoint.endpoint] = endpoint
-        self.add_methods
+        self.add_methods(self)
 
     @property
     def swagger(self):
@@ -229,8 +221,9 @@ class Resource(Method):
     @property
     def list_endpoints(self):
         endpoints = []
-        for endpoint in self.endpoints:
-            endpoints.append(endpoint.endpoint)
+        for endpoint_name in self.endpoints.keys():
+            if '@' in endpoint_name:
+                endpoints.append(endpoint_name)
         return endpoints
 
     @property
