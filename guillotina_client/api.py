@@ -2,8 +2,10 @@ from .exceptions import AlreadyExistsException
 from .exceptions import NotExistsException
 from .exceptions import RetriableAPIException
 from .exceptions import UnauthorizedException
+from .swagger import EndpointProducer
 
 from os.path import join
+import logging
 import requests
 import json
 
@@ -12,25 +14,55 @@ RETRIABLE_STATUS_CODES = (500, 502, 503, 504, 400, 408)
 RETRIABLE_EXCEPTIONS = (RetriableAPIException)
 
 
+class Method:
+    @classmethod
+    def add_methods(cls):
+        logger = logging.getLogger('Logger')
+        for endpoint in cls.endpoints:
+            endpoint_name = endpoint.endpoint.replace('@', '')
+            endpoint_name = endpoint_name.replace('-', '_')
+            for method_rest in endpoint.methods:
+                def method(**kargs):
+                    if method_rest == 'get':
+                        cls.client.get_request(cls.path, **kargs)
+                    elif method_rest == 'patch':
+                        cls.client.patch_request(cls.path, **kargs)
+                    elif method_rest == 'post':
+                        cls.client.post_request(cls.path, **kargs)
+                    else:
+                        logger.warning("Method not implemented")
+                parameters = str(endpoint.parameters)
+                method.__doc__ = endpoint.summary[method_rest] + str(parameters)
+                method.__name__ = f"{method_rest}{endpoint_name}"
+                setattr(cls, method.__name__, method)
+
+
 class Container:
     def __init__(self, cid, db, client):
         self.id = cid
         self.db = db
+        self.logger = logging.getLogger('Logger')
         self.client = client
+
+    @property
+    def swagger(self):
+        url_swagger = join(self.path, '@swagger')
+        swagger_response = self.client.get_request(url_swagger)
+        return swagger_response
 
     @property
     def server(self):
         return self.client.server
 
     @property
-    def base_url(self):
+    def path(self):
         return join(self.server, join(self.db, self.id))
 
     def create(self, type, id, title=None, path=None):
         """
         path is relative to container url
         """
-        path = join(self.base_url, path or '')
+        path = join(self.path, path or '')
         self.client.post_request(
             path,
             data=json.dumps({
@@ -44,7 +76,7 @@ class Container:
     def get(self, target):
         """
         path is relative to container url"""
-        path = join(self.base_url, target)
+        path = join(self.path, target)
         return Resource(path=path, client=self.client)
 
     def get_or_create(self, type, id, title=None, path=None):
@@ -53,13 +85,13 @@ class Container:
                 target = join(path, id)
             else:
                 target = id
-            target = target.lstrip(self.base_url)
+            target = target.lstrip(self.path)
             return self.get(target)
         except NotExistsException:
             return self.create(type, id, title, path)
 
     def __getitem__(self, key):
-        path = join(self.base_url, key)
+        path = join(self.path, key)
         return Resource(path=path, client=self.client)
 
 
@@ -174,7 +206,7 @@ class ApiClient:
         raise Exception(f'{resp}')
 
 
-class Resource:
+class Resource(Method):
     def __init__(self, path, client, id=None):
         self.client = client
         if not id:
@@ -182,6 +214,24 @@ class Resource:
             path = '/'.join(path.split('/')[:-1])
         self.parent_path = path
         self.id = id
+        self.endpoints = {}
+        logger = logging.getLogger()
+        for endpoint in EndpointProducer(self.swagger, logger):
+            self.endpoints[endpoint.endpoint] = endpoint
+        self.add_methods
+
+    @property
+    def swagger(self):
+        url_swagger = join(self.path, '@swagger')
+        swagger_response = self.client.get_request(url_swagger)
+        return swagger_response
+
+    @property
+    def list_endpoints(self):
+        endpoints = []
+        for endpoint in self.endpoints:
+            endpoints.append(endpoint.endpoint)
+        return endpoints
 
     @property
     def path(self):
@@ -192,5 +242,8 @@ class Resource:
         return Resource(path=path, client=self.client)
 
     def __getitem__(self, key):
-        path = join(self.path, key)
-        return Resource(path=path, client=self.client)
+        if '@' in key:
+            return self.endpoints.get(key, 'Endpoint not found')
+        else:
+            path = join(self.path, key)
+            return Resource(path=path, client=self.client)
