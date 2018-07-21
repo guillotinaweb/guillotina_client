@@ -35,6 +35,12 @@ def db_settings_swagger():
     return settings
 
 
+def db_settings_swagger():
+    settings = get_db_settings()
+    settings['applications'].append('guillotina_swagger')
+    return settings
+
+
 def guillotina_in_thread(port):
     # Create a new loop and set it
     loop = asyncio.new_event_loop()
