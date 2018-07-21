@@ -21,6 +21,7 @@ from guillotina.testing import TESTING_SETTINGS
 
 TESTING_SETTINGS.setdefault('applications', [])
 TESTING_SETTINGS['applications'].append('guillotina_dbusers')
+TESTING_SETTINGS['applications'].append('guillotina_swagger')
 
 TESTING_ROOT_USER = 'root'
 TESTING_ROOT_PWD = 'admin'
@@ -29,26 +30,13 @@ TEST_USER_PWD = 'password'
 TEST_USER_EMAIL = 'test@user.com'
 
 
-def db_settings_swagger():
-    settings = get_db_settings()
-    settings['applications'].append('guillotina_swagger')
-    return settings
-
-
-def db_settings_swagger():
-    settings = get_db_settings()
-    settings['applications'].append('guillotina_swagger')
-    return settings
-
-
 def guillotina_in_thread(port):
     # Create a new loop and set it
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     # Create guillotina app
     globalregistry.reset()
-    settings = db_settings_swagger()
-    aioapp = make_app(settings=settings, loop=loop)
+    aioapp = make_app(settings=get_db_settings(), loop=loop)
     aioapp.config.execute_actions()
     load_cached_schema()
     # Create test server with app
