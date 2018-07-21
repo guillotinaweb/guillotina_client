@@ -7,5 +7,4 @@ def test_basic_auth():
     auth = BasicAuth(username, password)
     encoded = 'cm9vdDphZG1pbg=='
     assert auth.token == encoded
-    assert 'Authorization' in auth.authorization
-    assert auth.authorization['Authorization'] == f'Basic {encoded}'
+    assert auth.authorization == f'Basic {encoded}'
