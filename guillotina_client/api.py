@@ -5,7 +5,6 @@ from .exceptions import UnauthorizedException
 from .swagger import EndpointProducer
 
 from os.path import join
-import logging
 import requests
 import json
 
@@ -14,27 +13,25 @@ RETRIABLE_STATUS_CODES = (500, 502, 503, 504, 400, 408)
 RETRIABLE_EXCEPTIONS = (RetriableAPIException)
 
 
-class Method:
-    def add_methods(self, cls):
-        logger = logging.getLogger('Logger')
-        for endpoint in cls.endpoints.values():
-            endpoint_name = endpoint.endpoint.replace('@', '')
-            endpoint_name = endpoint_name.replace('-', '_')
-            for method_rest in endpoint.methods:
-                def method(**kargs):
-                    if method_rest == 'get':
-                        return cls.client.get_request(cls.path, **kargs)
-                    elif method_rest == 'patch':
-                        return cls.client.patch_request(cls.path, **kargs)
-                    elif method_rest == 'post':
-                        return cls.client.post_request(cls.path, **kargs)
-                    else:
-                        logger.warning("Method not implemented")
-                parameters = str(endpoint.parameters)
-                if '@' in endpoint.endpoint:
-                    method.__doc__ = endpoint.summary[method_rest] + str(parameters)
-                    method.__name__ = f"{method_rest}{endpoint_name}"
-                    setattr(cls, method.__name__, method)
+def add_methods(ins):
+    for endpoint in ins.endpoints.values():
+        endpoint_name = endpoint.endpoint.replace('@', '')
+        endpoint_name = endpoint_name.replace('-', '_')
+        for method_rest in endpoint.methods:
+            def method(**kargs):
+                if method_rest == 'get':
+                    return ins.client.get_request(ins.path, **kargs)
+                elif method_rest == 'patch':
+                    return ins.client.patch_request(ins.path, **kargs)
+                elif method_rest == 'post':
+                    return ins.client.post_request(ins.path, **kargs)
+                else:
+                    return "Method not implemented"
+            parameters = str(endpoint.parameters)
+            if '@' in endpoint.endpoint:
+                method.__doc__ = endpoint.summary[method_rest] + str(parameters)
+                method.__name__ = f"{method_rest}{endpoint_name}"
+                setattr(ins, method.__name__, method)
 
 
 class Container:
@@ -197,7 +194,7 @@ class ApiClient:
         raise Exception(f'{resp}')
 
 
-class Resource(Method):
+class Resource:
     def __init__(self, path, client, id=None):
         self.client = client
         if not id:
@@ -206,11 +203,10 @@ class Resource(Method):
         self.parent_path = path
         self.id = id
         self.endpoints = {}
-        logger = logging.getLogger()
-        instance = EndpointProducer(self.swagger, logger)
+        instance = EndpointProducer(self.swagger)
         for endpoint in instance.endpoint_generator():
             self.endpoints[endpoint.endpoint] = endpoint
-        self.add_methods(self)
+        add_methods(self)
 
     @property
     def swagger(self):
