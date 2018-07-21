@@ -3,6 +3,7 @@ from .exceptions import LoginFailedException
 from datetime import datetime
 from base64 import b64encode
 import requests
+from os.path import join
 
 
 class IAuth:
@@ -89,6 +90,7 @@ class JWTAuth(IAuth):
         if self.token_expired or force:
             response = requests.post(
                 join(self.container, '@refresh_token'),
+                headers={'Authorization': self.authorization},
                 json={
                     'username': self.username,
                     'password': self.password
@@ -96,7 +98,6 @@ class JWTAuth(IAuth):
             )
             if response.status_code != 200:
                 raise RefreshTokenFailedException
-
             resp = response.json()
             self._token = resp['token']
             self._expires = resp['exp']

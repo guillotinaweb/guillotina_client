@@ -14,7 +14,7 @@ def BasicAuthClient(server, username, password):
     return ApiClient(server, session)
 
 
-def JWTAuthClient(container, username, password):
+def JWTAuthClient(server, container, username, password):
     session = JWTAuth(container, username, password)
     session.login()
     return ApiClient(server, session)
