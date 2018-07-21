@@ -1,7 +1,8 @@
 from guillotina_client.swagger import EndpointProducer
-from guillotina_client.client import GuillotinaClient
+from guillotina_client.client import BasicAuthClient
 from aiohttp.test_utils import TestServer
 from guillotina.tests.fixtures import get_db_settings
+from guillotina.tests.fixtures import GuillotinaDBRequester
 from guillotina.component import globalregistry
 from guillotina.content import load_cached_schema
 from guillotina.factory import make_app
@@ -12,6 +13,12 @@ import os
 import pytest
 import asyncio
 import time
+
+from guillotina.testing import TESTING_SETTINGS
+
+
+TESTING_SETTINGS.setdefault('applications', [])
+TESTING_SETTINGS['applications'].append('guillotina_dbusers')
 
 
 def guillotina_in_thread(port):
@@ -54,8 +61,16 @@ def guillotina_server():
 def client(guillotina_server):
     port = guillotina_server
     server_url = f'http://localhost:{port}'
-    print(f'*** Server running at {server_url}')
-    yield GuillotinaClient(server_url, 'root', 'admin')
+    print(f'\n*** Server running at {server_url}')
+    client = BasicAuthClient(server_url, 'root', 'admin')
+    populate_server(client)
+    yield client
+
+
+def populate_server(client):
+    # Create default container
+    client.set_database('db')
+    client.create_container('guillotina', title="Test Container")
 
 
 @pytest.fixture(scope='function')

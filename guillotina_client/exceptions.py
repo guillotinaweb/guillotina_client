@@ -12,3 +12,11 @@ class UnauthorizedException(Exception):
 
 class RetriableAPIException(Exception):
     pass
+
+
+class LoginFailedException(Exception):
+    pass
+
+
+class RefreshTokenFailedException(Exception):
+    pass
