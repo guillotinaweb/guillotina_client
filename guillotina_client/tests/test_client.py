@@ -11,7 +11,6 @@ def test_client_basic(client):
 
     resp = client.get_request(client.container.base_url)
     assert client.container.id == cid == resp['@name']
-
     # Get a map of databases and containers
     containers_per_db = {}
     for db in client.list_databases():
@@ -26,7 +25,6 @@ def test_client_basic(client):
         id='folder',
         title='My Folder'
     )
-
     # Create a subfoder
     subfolder = client.container.get_or_create(
         type='Folder',
@@ -54,7 +52,13 @@ def test_client_basic(client):
     item_ = folder_['myitem']
     subfolder_ = folder_['subfolder']
     subitem_ = subfolder_['myitem']
-
+    assert '@sharing' in subitem.list_endpoints
+    assert '@sharing' in folder.list_endpoints
+    assert '@sharing' in item.list_endpoints
+    # Check that dynamic methods are created
+    assert 'getsharing' in dir(item) and callable(item.getsharing)
+    assert 'getsharing' in dir(folder) and callable(item.getsharing)
+    assert 'getsharing' in dir(subitem) and callable(item.getsharing)
     assert folder.path == folder_.path
     assert subfolder.path == subfolder_.path
     assert item.path == item_.path

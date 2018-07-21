@@ -14,6 +14,12 @@ import asyncio
 import time
 
 
+def db_settings_swagger():
+    settings = get_db_settings()
+    settings['applications'].append('guillotina_swagger')
+    return settings
+
+
 def guillotina_in_thread(port):
     # Create a new loop and set it
     loop = asyncio.new_event_loop()
@@ -21,7 +27,8 @@ def guillotina_in_thread(port):
 
     # Create guillotina app
     globalregistry.reset()
-    aioapp = make_app(settings=get_db_settings(), loop=loop)
+    settings = db_settings_swagger()
+    aioapp = make_app(settings=settings, loop=loop)
     aioapp.config.execute_actions()
     load_cached_schema()
 
@@ -43,7 +50,7 @@ def guillotina_server():
     p.start()
 
     # Wait a bit until the server is started
-    time.sleep(0.5)
+    time.sleep(2.5)
 
     # Yield port so that client knows where to connect
     yield port

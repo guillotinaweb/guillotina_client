@@ -13,6 +13,9 @@ class EndpointObject:
         self.endpoint_json = endpoint_json
         self._methods = []
 
+    def __repr__(self):
+        return str(self.summary)
+
     @property
     def methods(self):
         self._methods = []
