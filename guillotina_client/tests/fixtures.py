@@ -1,44 +1,61 @@
 from guillotina_client.swagger import EndpointProducer
 from guillotina_client.client import GuillotinaClient
 from aiohttp.test_utils import TestServer
-
-from guillotina.tests.fixtures import GuillotinaDBRequester
-
+from guillotina.tests.fixtures import get_db_settings
+from guillotina.component import globalregistry
+from guillotina.content import load_cached_schema
+from guillotina.factory import make_app
+from aiohttp.test_utils import unused_port
+from multiprocessing import Process
 import logging
 import os
 import pytest
-import threading
 import asyncio
+import time
+
+
+def guillotina_in_thread(port):
+    # Create a new loop and set it
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+
+    # Create guillotina app
+    globalregistry.reset()
+    aioapp = make_app(settings=get_db_settings(), loop=loop)
+    aioapp.config.execute_actions()
+    load_cached_schema()
+
+    # Create test server with app
+    server = TestServer(aioapp, loop=loop, port=port)
+    loop.run_until_complete(server.start_server(loop=loop))
+    loop.run_forever()
 
 
 @pytest.fixture(scope='function')
-def guillotina_server(db, guillotina_main, loop):
-    server = TestServer(guillotina_main)
+def guillotina_server():
+    """Starts a guillotina server in a separate thread
+    """
+    # Choose random port
+    port = unused_port()
 
-    requester = GuillotinaDBRequester(server=server, loop=loop)
+    # Start new thread that launches guillotina server
+    p = Process(target=guillotina_in_thread, args=(port,))
+    p.start()
 
-    def loop_in_thread(loop, server):
-        asyncio.set_event_loop(loop)
-        loop.run_until_complete(server.start_server(loop=loop))
+    # Wait a bit until the server is started
+    time.sleep(0.5)
 
-    t = threading.Thread(target=loop_in_thread, args=(loop, server,))
-    t.daemon = True
-    t.start()
-
-    # Wait for server port assignment
-    import time
-    time.sleep(0.2)
-
-    yield requester
-    #    loop.run_until_complete(server.close())
+    # Yield port so that client knows where to connect
+    yield port
+    p.terminate()
 
 
 @pytest.fixture(scope='function')
 def client(guillotina_server):
-    host = guillotina_server.server.host
-    port = guillotina_server.server.port
-    server_url = f'http://{host}:{port}'
-    yield GuillotinaClient(server_url, 'root', 'root')
+    port = guillotina_server
+    server_url = f'http://localhost:{port}'
+    print(f'*** Server running at {server_url}')
+    yield GuillotinaClient(server_url, 'root', 'admin')
 
 
 @pytest.fixture(scope='function')
