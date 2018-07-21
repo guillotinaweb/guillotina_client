@@ -13,6 +13,9 @@ class EndpointObject:
         self.endpoint_json = endpoint_json
         self._methods = []
 
+    def __repr__(self):
+        return str(self.summary)
+
     @property
     def methods(self):
         self._methods = []
@@ -60,14 +63,13 @@ class EndpointObject:
 class EndpointProducer:
     """Given a swagger json response, yields EndpointObject instances
     """
-    def __init__(self, swagger_response, logger):
+    def __init__(self, swagger_response):
         if isinstance(swagger_response, str):
             self.swagger_response = json.loads(swagger_response)
         elif isinstance(swagger_response, dict):
             self.swagger_response = swagger_response
         else:
             raise Exception("Bad swagger type")
-        self.logger = logger
 
     @property
     def path(self):
@@ -89,6 +91,6 @@ class EndpointProducer:
             for path_endpoint in endpoints.keys():
                 yield EndpointObject(endpoints[path_endpoint], path_endpoint)
         except EndpointsDoNotExist:
-            self.logger.warning("Object Without Endpoint")
+            raise Exception('Object without endpoint')
         except Exception as e:
             raise e

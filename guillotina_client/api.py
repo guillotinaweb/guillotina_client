@@ -2,6 +2,7 @@ from .exceptions import AlreadyExistsException
 from .exceptions import NotExistsException
 from .exceptions import RetriableAPIException
 from .exceptions import UnauthorizedException
+from .swagger import EndpointProducer
 
 from os.path import join
 import requests
@@ -10,6 +11,27 @@ import json
 
 RETRIABLE_STATUS_CODES = (500, 502, 503, 504, 400, 408)
 RETRIABLE_EXCEPTIONS = (RetriableAPIException)
+
+
+def add_methods(ins):
+    for endpoint in ins.endpoints.values():
+        endpoint_name = endpoint.endpoint.replace('@', '')
+        endpoint_name = endpoint_name.replace('-', '_')
+        for method_rest in endpoint.methods:
+            def method(**kargs):
+                if method_rest == 'get':
+                    return ins.client.get_request(ins.path, **kargs)
+                elif method_rest == 'patch':
+                    return ins.client.patch_request(ins.path, **kargs)
+                elif method_rest == 'post':
+                    return ins.client.post_request(ins.path, **kargs)
+                else:
+                    return "Method not implemented"
+            parameters = str(endpoint.parameters)
+            if '@' in endpoint.endpoint:
+                method.__doc__ = endpoint.summary[method_rest] + str(parameters)
+                method.__name__ = f"{method_rest}{endpoint_name}"
+                setattr(ins, method.__name__, method)
 
 
 class Container:
@@ -27,10 +49,8 @@ class Container:
         return join(self.server, join(self.db, self.id))
 
     def create(self, type, id, title=None, path=None):
-        """
-        path is relative to container url
-        """
-        path = join(self.base_url, path or '')
+        if not path:
+            path = self.base_url
         self.client.post_request(
             path,
             data=json.dumps({
@@ -182,6 +202,25 @@ class Resource:
             path = '/'.join(path.split('/')[:-1])
         self.parent_path = path
         self.id = id
+        self.endpoints = {}
+        instance = EndpointProducer(self.swagger)
+        for endpoint in instance.endpoint_generator():
+            self.endpoints[endpoint.endpoint] = endpoint
+        add_methods(self)
+
+    @property
+    def swagger(self):
+        url_swagger = join(self.path, '@swagger')
+        swagger_response = self.client.get_request(url_swagger)
+        return swagger_response
+
+    @property
+    def list_endpoints(self):
+        endpoints = []
+        for endpoint_name in self.endpoints.keys():
+            if '@' in endpoint_name:
+                endpoints.append(endpoint_name)
+        return endpoints
 
     @property
     def path(self):
@@ -192,5 +231,8 @@ class Resource:
         return Resource(path=path, client=self.client)
 
     def __getitem__(self, key):
-        path = join(self.path, key)
-        return Resource(path=path, client=self.client)
+        if '@' in key:
+            return self.endpoints.get(key, 'Endpoint not found')
+        else:
+            path = join(self.path, key)
+            return Resource(path=path, client=self.client)

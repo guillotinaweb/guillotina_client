@@ -21,6 +21,7 @@ from guillotina.testing import TESTING_SETTINGS
 
 TESTING_SETTINGS.setdefault('applications', [])
 TESTING_SETTINGS['applications'].append('guillotina_dbusers')
+TESTING_SETTINGS['applications'].append('guillotina_swagger')
 
 TESTING_ROOT_USER = 'root'
 TESTING_ROOT_PWD = 'admin'
@@ -54,7 +55,9 @@ def guillotina_server():
     p = Process(target=guillotina_in_thread, args=(port,))
     p.start()
     # Wait a bit until the server is started
-    time.sleep(0.5)
+
+    time.sleep(2.5)
+
     # Yield port so that client knows where to connect
     guillotina_url = f'http://localhost:{port}'
     print(f'\n*** Server running at {guillotina_url}')
