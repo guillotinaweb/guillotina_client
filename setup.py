@@ -3,6 +3,7 @@ from setuptools import setup, find_packages
 
 
 requirements = open('requirements.txt').read()
+test_requirements = open('test_requirements.txt').read()
 readme = open('README.rst').read() + '\n'
 version = open('VERSION').read().strip()
 
@@ -33,15 +34,7 @@ setup(
     install_requires=requirements,
     extras_require={
         'test': [
-            'aiohttp>=3.0.0,<4.0.0',
-            'pytest<=3.1.0',
-            'docker',
-            'psycopg2',
-            'pytest-asyncio>=0.8.0',
-            'pytest-aiohttp',
-            'pytest-cov',
-            'coverage==4.0.3',
-            'pytest-docker-fixtures'
+            test_requirements
         ]
     },
 )

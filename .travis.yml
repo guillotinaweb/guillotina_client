@@ -1,0 +1,9 @@
+dist: trusty
+language: python
+python: 3.6.0
+
+install:
+  - pip install -r test_requirements.txt
+
+script:
+  - pytest -s --cov=guillotina_client -v --cov-report term-missing guillotina_client
