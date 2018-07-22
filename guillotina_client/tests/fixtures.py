@@ -106,11 +106,6 @@ def populate_server(guillotina_url):
 
 
 @pytest.fixture(scope='function')
-def logger():
-    return logging.getLogger('Swagger Logger mockup')
-
-
-@pytest.fixture(scope='function')
 def swagger_mock():
     script_dir = os.path.dirname(__file__)
     rel_path = "./swagger_response.json"
@@ -121,6 +116,6 @@ def swagger_mock():
 
 
 @pytest.fixture(scope='function')
-def endpoint_object(logger, swagger_mock):
-    endpoint_producer = EndpointProducer(swagger_mock, logger)
+def endpoint_object(swagger_mock):
+    endpoint_producer = EndpointProducer(swagger_mock)
     return next(endpoint_producer.endpoint_generator())
