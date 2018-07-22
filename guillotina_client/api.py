@@ -48,6 +48,21 @@ class Container:
     def base_url(self):
         return join(self.server, join(self.db, self.id))
 
+    def list_addons(self):
+        return self.client.get_request(join(self.base_url, '@addons'))
+
+    def install_addon(self, addon_id):
+        self.client.post_request(
+            join(self.base_url, '@addons'),
+            json={'id': addon_id}
+        )
+
+    def uninstall_addon(self, addon_id):
+        self.client.delete_request(
+            join(self.base_url, '@addons'),
+            json={'id': addon_id}
+        )
+
     def create(self, type, id, title=None, path=None):
         if not path:
             path = self.base_url
@@ -60,6 +75,18 @@ class Container:
             })
         )
         return Resource(path=path, id=id, client=self.client)
+
+    def create_user(self, username, email, password):
+        path = join(self.base_url, 'users')
+        return self.client.post_request(
+            path,
+            json={
+                '@type': 'User',
+                'username': username,
+                'password': password,
+                'email': email
+            }
+        )
 
     def get(self, target):
         """
