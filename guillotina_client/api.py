@@ -140,10 +140,11 @@ class ApiClient:
         db_url = join(self.server, db or self.db)
         return self.get_request(db_url)['containers']
 
-    def create_container(self, id, title=None):
-        if not self.db:
+    def create_container(self, id, db=None, title=None):
+        if not self.db and not db:
             raise Exception('Database is not set')
-        return self.post_request(self.db_url, data=json.dumps({
+        db_url = join(self.server, db or self.db)
+        return self.post_request(db_url, data=json.dumps({
             '@type': 'Container',
             'id': id,
             'title': title
@@ -152,6 +153,9 @@ class ApiClient:
     def set_container(self, cid, db=None):
         if not db and not self.db:
             raise Exception('Database not set')
+        if cid not in self.list_containers(db=db):
+            database = db or self.db
+            raise NotExistsException(f"Container {cid} not exists in {database} forgot to create_container?")
         self.container = Container(cid, db=db or self.db,
                                    client=self)
 

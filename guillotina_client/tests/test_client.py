@@ -1,20 +1,32 @@
+import pytest
+
+from guillotina_client.exceptions import (
+    NotExistsException, AlreadyExistsException
+)
+
+
 def test_client_basic(client):
     # Test container id
     cid = 'guillotina'
 
     # Set test container
     client.set_container(cid, db='db')
-
     resp = client.get_request(client.container.base_url)
     assert client.container.id == cid == resp['@name']
+    # container does not exists, raise exception
+    with pytest.raises(NotExistsException):
+        client.set_container(cid, db='db-custom')
+    client.create_container(cid, db="db-custom")
+    client.set_container(cid, db='db-custom')
+    with pytest.raises(AlreadyExistsException):
+        client.create_container(cid, db="db-custom")
     # Get a map of databases and containers
     containers_per_db = {}
     for db in client.list_databases():
         for c in client.list_containers(db):
             containers_per_db.setdefault(db, [])
             containers_per_db[db].append(c)
-    assert containers_per_db[db] == [cid]
-
+        assert containers_per_db[db] == [cid]
     # Once you set the container, you can create content
     folder = client.container.get_or_create(
         type='Folder',

@@ -1,4 +1,4 @@
 requests==2.19.1
-guillotina==4.0.6
+guillotina==4.8.6
 guillotina_dbusers==2.0.1
 guillotina-swagger==1.0.9

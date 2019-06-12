@@ -8,7 +8,6 @@ from guillotina.factory import make_app
 from aiohttp.test_utils import unused_port
 from multiprocessing import Process
 from guillotina_client.auth import BasicAuth
-import logging
 import os
 from os.path import join
 import pytest
@@ -36,7 +35,7 @@ def guillotina_in_thread(port):
     asyncio.set_event_loop(loop)
     # Create guillotina app
     globalregistry.reset()
-    aioapp = make_app(settings=get_db_settings(), loop=loop)
+    aioapp = loop.run_until_complete(make_app(settings=get_db_settings(), loop=loop))
     aioapp.config.execute_actions()
     load_cached_schema()
     # Create test server with app

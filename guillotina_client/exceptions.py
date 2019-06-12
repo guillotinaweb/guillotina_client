@@ -1,22 +1,41 @@
-class AlreadyExistsException(Exception):
+from guillotina.glogging import Logger
+
+logger = Logger(__name__)
+
+
+class BaseException(Exception):
+    def __init__(self, message=''):
+        logger.error(message)
+
+
+class AlreadyExistsException(BaseException):
+    def __init__(self, message=''):
+        super().__init__(message)
+
+
+class NotExistsException(BaseException):
+    def __init__(self, message=''):
+        super().__init__(message)
+
+
+class UnauthorizedException(BaseException):
+    def __init__(self, message=''):
+        super().__init__(message)
     pass
 
 
-class NotExistsException(Exception):
+class RetriableAPIException(BaseException):
+    def __init__(self, message=''):
+        super().__init__(message)
     pass
 
 
-class UnauthorizedException(Exception):
+class LoginFailedException(BaseException):
+    def __init__(self, message=''):
+        super().__init__(message)
     pass
 
 
-class RetriableAPIException(Exception):
-    pass
-
-
-class LoginFailedException(Exception):
-    pass
-
-
-class RefreshTokenFailedException(Exception):
-    pass
+class RefreshTokenFailedException(BaseException):
+    def __init__(self, message=''):
+        super().__init__(message)
